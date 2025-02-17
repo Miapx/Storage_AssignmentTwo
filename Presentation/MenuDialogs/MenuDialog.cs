@@ -3,9 +3,10 @@ using Business.Services;
 
 namespace Presentation.MenuDialogs;
 
-public class MenuDialog(CustomerService customerService)
+public class MenuDialog(CustomerService customerService, ProjectService projectService)
 {
     private readonly CustomerService _customerService = customerService;
+    private readonly ProjectService _projectService = projectService;
 
     public async Task MainMenuDialogAsync()
     {
@@ -21,7 +22,7 @@ public class MenuDialog(CustomerService customerService)
                 await CustomerDialog();
                 break;
             case "2":
-                //    await ProjectsDialog();
+                await ProjectsDialog();
                 break;
         }
     }
@@ -161,4 +162,70 @@ public class MenuDialog(CustomerService customerService)
         Console.ReadKey();
     }
 
+
+    public async Task ProjectsDialog()
+    {
+        Console.WriteLine("---------Manage projects---------");
+        Console.WriteLine("1. Create new project");
+        Console.WriteLine("2. View All projects");
+        Console.WriteLine("3. Update project");
+        Console.WriteLine("4. Delete project");
+        var option = Console.ReadLine();
+
+        switch (option)
+        {
+            case "1":
+                await CreateNewProjectOption();
+                break;
+            //case "2":
+            //    await ViewAllProjectsOption();
+            //    break;
+            //case "3":
+            //    await UpdateProjectOption();
+            //    break;
+            //case "4":
+            //    await DeleteProjectOption();
+            //    break;
+        }
+    }
+
+    public async Task CreateNewProjectOption()
+    {
+        var projectRegistrationForm = new ProjectRegistrationForm();
+
+        Console.WriteLine("CREATE NEW PROJECT");
+        Console.Write("Enter projects title: ");
+        projectRegistrationForm.Title = Console.ReadLine()!;
+        Console.Write("Enter projects description: ");
+        projectRegistrationForm.Description = Console.ReadLine()!;
+        Console.Write("Enter projects start date (DD/MM/YY): ");
+        var projectStartDate = Console.ReadLine()!;
+        projectRegistrationForm.StartDate = Convert.ToDateTime(projectStartDate);
+
+        Console.Write("Enter projects end date (DD/MM/YY): ");
+        var projectEndDate = Console.ReadLine()!;
+        projectRegistrationForm.EndDate = Convert.ToDateTime(projectEndDate);
+
+        var allCustomers = await _customerService.GetAllCustomersAsync();
+        foreach (var customer in allCustomers)
+        {
+            Console.WriteLine($"ID: {customer.Id} Name: {customer.CustomerName}");
+        }
+
+        Console.Write("Above is a list of all our customers. If the customer for this project is not on this list, please go back to the main menu and add the customer via the 'Manage Customers' option. " +
+            "Enter the ID of the customer assigned to this project: ");
+        var projectsCustomer = Console.ReadLine()!;
+        projectRegistrationForm.CustomerId = Convert.ToInt32(projectsCustomer);
+
+        var result = await _projectService.CreateProjectAsync(projectRegistrationForm);
+        if (result)
+        {
+            Console.WriteLine("Project was created sucessfully");
+        }
+        else
+        {
+            Console.WriteLine("Something went wrong when trying to create new project");
+        }
+        Console.ReadKey();
+    }
 }

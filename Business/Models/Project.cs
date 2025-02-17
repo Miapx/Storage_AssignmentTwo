@@ -4,6 +4,16 @@ namespace Business.Models;
 
 public class Project
 {
+    public Project(int id, string title, string? description, DateTime startDate, DateTime endDate, CustomerEntity customer)
+    {
+        Id = id;
+        Title = title;
+        Description = description;
+        StartDate = startDate;
+        EndDate = endDate;
+        Customer = customer;
+    }
+
     public int Id { get; set; }
     public string Title { get; set; } = null!;
     public string? Description { get; set; }

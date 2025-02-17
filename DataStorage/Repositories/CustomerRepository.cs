@@ -69,17 +69,5 @@ public class CustomerRepository(DataContext context)
         { 
             return false; 
         }
-
-
-        //    var entity = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
-        //    if (entity != null)
-        //    {
-        //        _context.Customers.Remove(entity);
-        //        await _context.SaveChangesAsync();
-        //        return true;
-        //    }
-        //    return false;
-        //}
-
     } 
 }

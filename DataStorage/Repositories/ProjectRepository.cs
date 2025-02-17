@@ -1,6 +1,7 @@
 ﻿using DataStorage.Contexts;
 using DataStorage.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DataStorage.Repositories;
 
@@ -8,27 +9,65 @@ public class ProjectRepository(DataContext context)
 {
     private readonly DataContext _context = context;
 
-    //READ
-    public async Task<IEnumerable<ProjectEntity>> GetAllAsync()
-    {
-        return await _context.Projects.ToListAsync();
-    }
+    //CREATE
 
-    public async Task<ProjectEntity?> GetAsync(int id)
+    public async Task<bool> CreateAsync(ProjectEntity entity)
     {
-        return await _context.Projects.FirstOrDefaultAsync(x => x.Id == id);
-    }
-
-    //DELETE
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var entity = await _context.Projects.FirstOrDefaultAsync(x => x.Id == id);
-        if (entity != null)
+        try
         {
-            _context.Projects.Remove(entity);
+            _context.Projects.Add(entity);
             await _context.SaveChangesAsync();
             return true;
         }
-        return false;
+        catch
+        {
+            return false;
+        }
+    }
+
+
+    //READ
+
+    public async Task<IEnumerable<ProjectEntity>> GetAllAsync()
+    {
+        var entities = await _context.Projects.ToListAsync();
+        return entities;
+    }
+
+    public async Task<ProjectEntity?> GetAsync(Expression<Func<ProjectEntity, bool>> expression)
+    {
+        return await _context.Projects.FirstOrDefaultAsync(expression);
+    }
+
+    //UPDATE
+
+    public async Task<bool> UpdateAsync(ProjectEntity entity)
+    {
+        try
+        {
+            _context.Projects.Update(entity);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+
+    //DELETE
+    public async Task<bool> DeleteAsync(ProjectEntity entity)
+    {
+        try
+        {
+            _context.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
