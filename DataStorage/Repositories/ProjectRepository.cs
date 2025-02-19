@@ -44,6 +44,7 @@ public class ProjectRepository(DataContext context)
     public async Task<bool> UpdateAsync(ProjectEntity entity)
     {
         try
+        
         {
             _context.Projects.Update(entity);
             await _context.SaveChangesAsync();

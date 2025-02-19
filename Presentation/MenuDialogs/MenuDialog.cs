@@ -1,4 +1,5 @@
 ﻿using Business.Dtos;
+using Business.Models;
 using Business.Services;
 
 namespace Presentation.MenuDialogs;
@@ -177,15 +178,15 @@ public class MenuDialog(CustomerService customerService, ProjectService projectS
             case "1":
                 await CreateNewProjectOption();
                 break;
-            //case "2":
-            //    await ViewAllProjectsOption();
-            //    break;
-            //case "3":
-            //    await UpdateProjectOption();
-            //    break;
-            //case "4":
-            //    await DeleteProjectOption();
-            //    break;
+            case "2":
+                await ViewAllProjectsOption();
+                break;
+            case "3":
+                await UpdateProjectOption();
+                break;
+            case "4":
+                await DeleteProjectOption();
+                break;
         }
     }
 
@@ -206,13 +207,16 @@ public class MenuDialog(CustomerService customerService, ProjectService projectS
         var projectEndDate = Console.ReadLine()!;
         projectRegistrationForm.EndDate = Convert.ToDateTime(projectEndDate);
 
+        Console.WriteLine("Please type in if the project is 'Not started', 'In progress' or 'Finished'");
+        projectRegistrationForm.StatusName = Console.ReadLine()!;
+
         var allCustomers = await _customerService.GetAllCustomersAsync();
         foreach (var customer in allCustomers)
         {
             Console.WriteLine($"ID: {customer.Id} Name: {customer.CustomerName}");
         }
 
-        Console.Write("Above is a list of all our customers. If the customer for this project is not on this list, please go back to the main menu and add the customer via the 'Manage Customers' option. " +
+        Console.Write("Above is a list of all our customers. " +
             "Enter the ID of the customer assigned to this project: ");
         var projectsCustomer = Console.ReadLine()!;
         projectRegistrationForm.CustomerId = Convert.ToInt32(projectsCustomer);
@@ -225,6 +229,128 @@ public class MenuDialog(CustomerService customerService, ProjectService projectS
         else
         {
             Console.WriteLine("Something went wrong when trying to create new project");
+        }
+        Console.ReadKey();
+    }
+
+    public async Task ViewAllProjectsOption()
+    {
+        Console.WriteLine("VIEW ALL PROJECTS");
+
+        var projects = await _projectService.GetAllProjectsAsync();
+
+        if (projects != null)
+        {
+            foreach (var project in projects)
+                Console.WriteLine($"ID: {project.Id}, Title: {project.Title}, Description: {project.Description}, Start-date: {project.StartDate}, End-date: {project.EndDate}, Status: {project.StatusName}, Customer: {project.Customer.CustomerName}");
+        }
+        else
+        {
+            Console.WriteLine("No projects found");
+        }
+        Console.ReadKey();
+    }
+
+    public async Task UpdateProjectOption()
+    {
+        Console.WriteLine("UPDATE PROJECT");
+        Console.WriteLine("These are all the projects: ");
+
+        var projects = await _projectService.GetAllProjectsAsync();
+
+        if (projects != null)
+        {
+            foreach (var project in projects)
+                Console.WriteLine($"Id: {project.Id}. Name: {project.Title}");
+        }
+        else
+        {
+            Console.WriteLine("No projects found");
+        }
+
+        var projectUpdateForm = new ProjectUpdateForm();
+        Console.Write("Enter the ID of the Project you want to update: ");
+        var chosenProject = Console.ReadLine();
+        projectUpdateForm.Id = Convert.ToInt32(chosenProject);
+
+        Console.Write("Enter the name of you wish to update to: ");
+        projectUpdateForm.Title = Console.ReadLine()!;
+
+        Console.Write("Enter the description: ");
+        projectUpdateForm.Description = Console.ReadLine()!;
+
+        Console.Write("Enter projects start date (DD/MM/YY): ");
+        var projectStartDate = Console.ReadLine()!;
+        projectUpdateForm.StartDate = Convert.ToDateTime(projectStartDate);
+
+        Console.Write("Enter projects end date (DD/MM/YY): ");
+        var projectEndDate = Console.ReadLine()!;
+        projectUpdateForm.EndDate = Convert.ToDateTime(projectEndDate);
+
+        Console.Write("Enter the status: ");
+        projectUpdateForm.StatusName = Console.ReadLine()!;
+
+        Console.WriteLine("These are all the customers: ");
+
+
+        var customers = await _customerService.GetAllCustomersAsync();
+
+        if (customers != null)
+        {
+            foreach (var customer in customers)
+                Console.WriteLine($"Id: {customer.Id}. Name: {customer.CustomerName}");
+        }
+        else
+        {
+            Console.WriteLine("No customers found");
+        }
+
+        Console.Write("Enter the ID of the customer on this project: ");
+        var updatedProjectCustomer = Console.ReadLine()!;
+        projectUpdateForm.CustomerId = Convert.ToInt32(updatedProjectCustomer);
+
+        var result = await _projectService.UpdateProjectAsync(projectUpdateForm);
+
+        if (result != null)
+        {
+            Console.WriteLine("Project was updated succesfully");
+        }
+        else
+        {
+            Console.WriteLine("Something went wrong when trying to update project");
+        }
+        Console.ReadKey();
+    } 
+
+    public async Task DeleteProjectOption()
+    {
+        Console.WriteLine("DELETE PROJECT");
+        Console.WriteLine("These are all the projects: ");
+
+
+        var projects = await _projectService.GetAllProjectsAsync();
+
+        if (projects != null)
+        {
+            foreach (var project in projects)
+                Console.WriteLine($"Id: {project.Id}. Name: {project.Title}");
+        }
+        else
+        {
+            Console.WriteLine("No project found");
+        }
+
+        Console.Write("Enter the ID of the project you want to delete: ");
+        var projectDeleteOption = Console.ReadLine();
+        var projectDeleteOptionId = Convert.ToInt32(projectDeleteOption);
+        var result = await _projectService.DeleteProjectAsync(projectDeleteOptionId);
+        if (result)
+        {
+            Console.WriteLine("Project was deleted succesfully");
+        }
+        else
+        {
+            Console.WriteLine("Something went wrong when trying to delete project");
         }
         Console.ReadKey();
     }

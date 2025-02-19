@@ -19,8 +19,9 @@ public class ProjectService(ProjectRepository projectRepository)
         {
             Title = form.Title,
             Description = form.Description,
-            StartDate = DateTime.Now,
-            EndDate = DateTime.MaxValue,
+            StartDate = form.StartDate,
+            EndDate = form.EndDate,
+            StatusName = form.StatusName,
             CustomerId = form.CustomerId,
         };
 
@@ -30,11 +31,11 @@ public class ProjectService(ProjectRepository projectRepository)
     }
 
     //READ
-    public async Task<IEnumerable<Project>> GetAllCustomersAsync()
+    public async Task<IEnumerable<Project>> GetAllProjectsAsync()
     {
         var project = await _projectRepository.GetAllAsync();
         return project.Select((ProjectEntity entity) => {
-            return new Project(entity.Id, entity.Title, entity.Description, entity.StartDate, entity.EndDate, entity.Customer);
+            return new Project(entity.Id, entity.Title, entity.Description, entity.StartDate, entity.EndDate, entity.StatusName, entity.Customer);
         });
         //Select((TAR IN ENTITY och via en FUNKTION mappar om till MODEL
     }
@@ -45,7 +46,19 @@ public class ProjectService(ProjectRepository projectRepository)
         if (projectEntity == null)
             return null;
 
-        return new Project(projectEntity.Id, projectEntity.Title, projectEntity.Description, projectEntity.StartDate, projectEntity.EndDate, projectEntity.Customer);
+        var projectModel = new Project
+        {
+            Id = projectEntity.Id,
+            Title = projectEntity.Title,
+            Description = projectEntity.Description,
+            StartDate = projectEntity.StartDate,
+            EndDate = projectEntity.EndDate,
+            StatusName = projectEntity.StatusName,
+            Customer = projectEntity.Customer
+        };
+        return projectModel;
+
+        //return new Project(projectEntity.Id, projectEntity.Title, projectEntity.Description, projectEntity.StartDate, projectEntity.EndDate, projectEntity.StatusName, projectEntity.Customer);
     }
 
     //UPDATE (ProjectEntity ska skickas in i UpdateAsync.
@@ -59,13 +72,25 @@ public class ProjectService(ProjectRepository projectRepository)
         project.Description = form.Description;
         project.StartDate = form.StartDate;
         project.EndDate = form.EndDate;
-        project.Customer = form.Customer;
+        project.StatusName = form.StatusName;
+        project.CustomerId = form.CustomerId;
 
 
         await _projectRepository.UpdateAsync(project);
         project = await _projectRepository.GetAsync(x => x.Id == form.Id);
-        return project != null ? new Project(project.Id, project.Title, project.Description, project.StartDate, project.EndDate, project.Customer) : null;
+        //return project != null ? new Project(project.Id, project.Title, project.Description, project.StartDate, project.EndDate, project.StatusName, project.Customer) : null;
         //new Project(SKAPAR MODEL och via en KONSTRUKTOR mappar om till ENTITY 
+        var projectModel = new Project
+        {
+            Id = form.Id,
+            Title = project.Title,
+            Description = project.Description,
+            StartDate = project.StartDate,
+            EndDate = project.EndDate,
+            StatusName = project.StatusName,
+            Customer = project.Customer
+        };
+        return projectModel; 
     }
 
     //DELETE

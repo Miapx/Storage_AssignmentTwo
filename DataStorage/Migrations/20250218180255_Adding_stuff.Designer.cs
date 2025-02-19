@@ -4,6 +4,7 @@ using DataStorage.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataStorage.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250218180255_Adding_stuff")]
+    partial class Adding_stuff
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,11 +36,16 @@ namespace DataStorage.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CustomerEntityId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerEntityId");
 
                     b.ToTable("Customers");
                 });
@@ -77,10 +85,17 @@ namespace DataStorage.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("DataStorage.Entities.CustomerEntity", b =>
+                {
+                    b.HasOne("DataStorage.Entities.CustomerEntity", null)
+                        .WithMany("Customers")
+                        .HasForeignKey("CustomerEntityId");
+                });
+
             modelBuilder.Entity("DataStorage.Entities.ProjectEntity", b =>
                 {
                     b.HasOne("DataStorage.Entities.CustomerEntity", "Customer")
-                        .WithMany("Projects")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -90,7 +105,7 @@ namespace DataStorage.Migrations
 
             modelBuilder.Entity("DataStorage.Entities.CustomerEntity", b =>
                 {
-                    b.Navigation("Projects");
+                    b.Navigation("Customers");
                 });
 #pragma warning restore 612, 618
         }

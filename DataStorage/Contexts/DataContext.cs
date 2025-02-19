@@ -14,4 +14,16 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         optionsBuilder.UseLazyLoadingProxies();
         base.OnConfiguring(optionsBuilder);
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+
+        modelBuilder.Entity<ProjectEntity>()
+            .HasOne(x => x.Customer)
+            .WithMany(x => x.Projects)
+            .HasForeignKey(x => x.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
