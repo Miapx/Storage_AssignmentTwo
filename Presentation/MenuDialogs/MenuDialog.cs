@@ -113,7 +113,15 @@ public class MenuDialog(CustomerService customerService, ProjectService projectS
         var customerUpdateForm = new CustomerUpdateForm();
         Console.Write("Enter the ID of the Customer you want to update: ");
         var chosenCustomer = Console.ReadLine();
+        try { 
         customerUpdateForm.Id = Convert.ToInt32(chosenCustomer);
+            }
+        catch
+        {
+            Console.WriteLine("Invalid ID. Press any key to return to main menu.");
+            Console.ReadKey();
+            return;
+        }
 
         Console.WriteLine("Enter the name of you wish to update to");
         customerUpdateForm.CustomerName = Console.ReadLine()!;
@@ -271,8 +279,15 @@ public class MenuDialog(CustomerService customerService, ProjectService projectS
         var projectUpdateForm = new ProjectUpdateForm();
         Console.Write("Enter the ID of the Project you want to update: ");
         var chosenProject = Console.ReadLine();
+        try {  
         projectUpdateForm.Id = Convert.ToInt32(chosenProject);
-
+            }
+        catch
+        {
+            Console.WriteLine("Invalid ID. Press any key to return to main menu");
+            Console.ReadKey();
+            return;
+        }
         Console.Write("Enter the name of you wish to update to: ");
         projectUpdateForm.Title = Console.ReadLine()!;
 
@@ -287,7 +302,7 @@ public class MenuDialog(CustomerService customerService, ProjectService projectS
         var projectEndDate = Console.ReadLine()!;
         projectUpdateForm.EndDate = Convert.ToDateTime(projectEndDate);
 
-        Console.Write("Enter the status: ");
+        Console.Write("Type in if the project is 'Not started', 'In progress' or 'Finished': ");
         projectUpdateForm.StatusName = Console.ReadLine()!;
 
         Console.WriteLine("These are all the customers: ");
@@ -309,18 +324,27 @@ public class MenuDialog(CustomerService customerService, ProjectService projectS
         var updatedProjectCustomer = Console.ReadLine()!;
         projectUpdateForm.CustomerId = Convert.ToInt32(updatedProjectCustomer);
 
-        var result = await _projectService.UpdateProjectAsync(projectUpdateForm);
+        Console.WriteLine("Press Y to save your changes, or N to cancel. ");
+        var option = Console.ReadLine()!;
 
-        if (result != null)
+        if (option.ToUpper() == "Y")
         {
-            Console.WriteLine("Project was updated succesfully");
-        }
-        else
-        {
-            Console.WriteLine("Something went wrong when trying to update project");
-        }
-        Console.ReadKey();
-    } 
+
+            var result = await _projectService.UpdateProjectAsync(projectUpdateForm);
+
+            if (result != null)
+            {
+                Console.WriteLine("Project was updated succesfully");
+            }
+            else
+            {
+                Console.WriteLine("Something went wrong when trying to update project");
+            }
+            Console.ReadKey();
+        }   
+        else return;
+    }
+ 
 
     public async Task DeleteProjectOption()
     {
@@ -342,16 +366,26 @@ public class MenuDialog(CustomerService customerService, ProjectService projectS
 
         Console.Write("Enter the ID of the project you want to delete: ");
         var projectDeleteOption = Console.ReadLine();
-        var projectDeleteOptionId = Convert.ToInt32(projectDeleteOption);
-        var result = await _projectService.DeleteProjectAsync(projectDeleteOptionId);
-        if (result)
+        try
         {
-            Console.WriteLine("Project was deleted succesfully");
+            var projectDeleteOptionId = Convert.ToInt32(projectDeleteOption);
+            var result = await _projectService.DeleteProjectAsync(projectDeleteOptionId);
+            if (result)
+            {
+                Console.WriteLine("Project was deleted succesfully");
+            }
+            else
+            {
+                Console.WriteLine("Something went wrong when trying to delete project");
+            }
         }
-        else
+        catch
         {
-            Console.WriteLine("Something went wrong when trying to delete project");
+            Console.WriteLine("No project with that ID was found. Press any key to return to main menu. ");
+            Console.ReadKey();
+            return;
         }
+
         Console.ReadKey();
     }
 }

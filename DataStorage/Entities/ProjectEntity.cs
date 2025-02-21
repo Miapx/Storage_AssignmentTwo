@@ -13,8 +13,8 @@ public class ProjectEntity
 
     [Column(TypeName = "date")]
     public DateTime EndDate { get; set; }
-
     public string StatusName { get; set; } = null!;
+
     public int CustomerId { get; set; }
     public virtual CustomerEntity Customer { get; set; } = null!;
 }
