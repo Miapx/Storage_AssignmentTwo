@@ -30,7 +30,6 @@ public class ProjectService(ProjectRepository projectRepository)
         return result;
     }
 
-    //READ
     public async Task<IEnumerable<Project>> GetAllProjectsAsync()
     {
         var project = await _projectRepository.GetAllAsync();
@@ -58,10 +57,9 @@ public class ProjectService(ProjectRepository projectRepository)
         };
         return projectModel;
 
-        //return new Project(projectEntity.Id, projectEntity.Title, projectEntity.Description, projectEntity.StartDate, projectEntity.EndDate, projectEntity.StatusName, projectEntity.Customer);
+        //annan approach: return new Project(projectEntity.Id, projectEntity.Title, projectEntity.Description, projectEntity.StartDate, projectEntity.EndDate, projectEntity.StatusName, projectEntity.Customer);
     }
 
-    //UPDATE (ProjectEntity ska skickas in i UpdateAsync.
     public async Task<Project?> UpdateProjectAsync(ProjectUpdateForm form)
     {
         var project = await _projectRepository.GetAsync(x => x.Id == form.Id);
@@ -78,8 +76,7 @@ public class ProjectService(ProjectRepository projectRepository)
 
         await _projectRepository.UpdateAsync(project);
         project = await _projectRepository.GetAsync(x => x.Id == form.Id);
-        //return project != null ? new Project(project.Id, project.Title, project.Description, project.StartDate, project.EndDate, project.StatusName, project.Customer) : null;
-        //new Project(SKAPAR MODEL och via en KONSTRUKTOR mappar om till ENTITY 
+        //annan approach: return project != null ? new Project(project.Id, project.Title, project.Description, project.StartDate, project.EndDate, project.StatusName, project.Customer) : null;
         var projectModel = new Project
         {
             Id = form.Id,
@@ -93,7 +90,6 @@ public class ProjectService(ProjectRepository projectRepository)
         return projectModel; 
     }
 
-    //DELETE
     public async Task<bool> DeleteProjectAsync(int id)
     {
         var project = await _projectRepository.GetAsync(x => x.Id == id);
